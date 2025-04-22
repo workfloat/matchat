@@ -124,6 +124,11 @@ export default class MatChat {
     };
 
     this.options = this.validateOptions({ ...this.defaultOptions, ...options });
+
+    if (this.options.title !== 'Matcha' && options.avatarUrl) {
+      options.avatarUrl = `https://ui-avatars.com/api/?name=${this.options.title}&background=4361ee&color=fff`;
+    }
+
     this.isOpen = false;
     this.isWaitingForResponse = false;
     this.sessionId = this.generateSessionId();
