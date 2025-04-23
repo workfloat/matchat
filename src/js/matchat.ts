@@ -1,3 +1,5 @@
+import DOMPurify from 'dompurify';
+
 interface MatChatColors {
   primary?: string;
   primaryDark?: string;
@@ -441,7 +443,7 @@ export default class MatChat {
         "Thanks for your message! We'll get back to you soon.";
       const formattedReply = data.formattedResponse ? 
         data.formattedResponse : 
-        this.formatMessage(reply);
+        this.formatMessage(reply, 'bot');
       
       this.addMessage(formattedReply, 'bot');
     } catch (error) {
@@ -463,7 +465,7 @@ export default class MatChat {
       const messageContent = document.createElement('div');
       messageContent.className = 'message-content';
       
-      const formattedText = this.formatMessage(text);
+      const formattedText = this.formatMessage(text, sender);
       messageContent.innerHTML = formattedText;
       
       messageElement.appendChild(messageContent);
@@ -480,26 +482,43 @@ export default class MatChat {
     }
   }
 
-  private formatMessage(text: string): string {
+  private formatMessage(text: string, sender: string): string {
     if (typeof text !== 'string') return '';
-    
-    let html = this.markdownToHtml(text);
+    let html = '';
+    if (sender === 'user') {
+      const escaped = this.escapeHtml(text);
+      html = this.markdownToHtml(escaped);
+    }
+    if (sender === 'bot') {
+      html = this.markdownToHtml(text);
+      html = this.sanitizeHtml(html);
+    }
     html = html.replace(/\n/g, '<br>');
-    return this.sanitizeHtml(html);
+    return html;
+  }
+
+  private escapeHtml(text: string): string {
+    const map: { [key: string]: string } = {
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;'
+    };
+    return text.replace(/[&<>"']/g, m => map[m]);
   }
 
   private markdownToHtml(text: string): string {
+    text = text.replace(/```([\s\S]*?)```/g, '<pre><code>$1</code></pre>');
+    text = text.replace(/`([^`]+)`/g, '<code>$1</code>');
     return text
-      .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>')
-      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-      .replace(/\*(.*?)\*/g, '<em>$1</em>')
-      .replace(/`(.*?)`/g, '<code>$1</code>');
+      .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>')
+      .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+      .replace(/\*([^*]+)\*/g, '<em>$1</em>');
   }
+  
 
   private sanitizeHtml(html: string): string {
-    const temp = document.createElement('div');
-    temp.textContent = html;
-    return temp.innerHTML;
+    return DOMPurify.sanitize(html, {
+      ALLOWED_TAGS: ['strong', 'em', 'a', 'code', 'pre', 'br', 'p', 'ul', 'ol', 'li'],
+      ALLOWED_ATTR: ['href', 'target', 'rel'],
+    });
   }
 
   private showTypingIndicator(): void {

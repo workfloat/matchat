@@ -1,0 +1,21 @@
+# Build tools
+babel.config.js
+.babelrc
+webpack.config.js
+rollup.config.js
+
+src/
+
+tests/
+coverage/
+.github/
+.gitlab-ci.yml
+
+.env*
+.eslint*
+.prettier*
+*.log
+
+.DS_Store
+.idea/
+.vscode/
