@@ -1,6 +1,6 @@
 {
   "name": "@workfloat/matchat",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "scripts": {
     "build": "webpack --mode production",
     "dev": "webpack --mode development --watch",
@@ -16,7 +16,7 @@
   "main": "dist/matchat.cjs.js",
   "module": "dist/matchat.esm.js",
   "browser": "dist/matchat.umd.js",
-  "types": "dist/index.d.ts",
+  "types": "dist/types/index.d.ts",
   "style": "dist/matchat.css",
   "keywords": [
     "chat",
