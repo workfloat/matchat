@@ -2,6 +2,29 @@
 
 MatChat is a lightweight and customizable chat widget designed for seamless integration into any website. It supports custom themes, real-time messaging, and integration with external APIs or webhook endpoints like nodemation (n8n). Perfect for customer support, user engagement, or AI chatbot implementations.
 
+## Demo
+
+https://workfloat.github.io/matchat/
+
+# Installation
+
+## via cdn
+```
+<!-- Latest Version -->
+<script src="https://cdn.jsdelivr.net/npm/@workfloat/matchat@latest/dist/matchat.umd.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@workfloat/matchat@latest/dist/matchat.min.css">
+
+<!-- Specific Version (0.1.3) -->
+<script src="https://cdn.jsdelivr.net/npm/@workfloat/matchat@0.1.3/dist/matchat.umd.min.js"></script>
+```
+
+### via npm
+
+```
+npm install @workfloat/matchat
+```
+
+
 ## Quick Start
 
 ### 1. Include CSS/JS
