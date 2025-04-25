@@ -1,0 +1,109 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, master ]
+  release:
+    types: [published]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 20.x
+    - run: npm ci
+    - run: npm test
+
+  build:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 20.x
+    - run: npm ci
+    - run: npm run build
+    - uses: actions/upload-artifact@v3
+      with:
+        name: dist
+        path: dist
+
+  publish-npm:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+          registry-url: https://registry.npmjs.org
+      - uses: actions/download-artifact@v3
+        with:
+          name: dist
+          path: dist
+      - run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  cdnjs:
+    needs: publish-npm
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create CDNJS PR
+        uses: cdnjs/autoversion@v1
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          package-name: '@workfloat/matchat'
+          version: ${{ github.ref_name }}
+          files: |
+            dist/*.js
+            dist/*.css
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/download-artifact@v3
+      with:
+        name: dist
+        path: dist
+    - name: Create demo page
+      run: |
+        mkdir -p docs
+        cp -r dist/* docs/
+        cat > docs/index.html <<EOF
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <title>MatChat Demo</title>
+            <link rel="stylesheet" href="matchat.min.css">
+        </head>
+        <body>
+            <div id="chat-container"></div>
+            <script src="matchat.umd.min.js"></script>
+            <script>
+                const matChat = new MatChat({
+                    position: 'bottom-right',
+                    title: 'Demo Chat',
+                    onMessageSend: (message, callback) => {
+                        setTimeout(() => {
+                            callback(\`Echo: \${message}\`);
+                        }, 1000);
+                    }
+                });
+            </script>
+        </body>
+        </html>
+        EOF
+        touch docs/.nojekyll
+    - name: Deploy to GitHub Pages
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./docs
