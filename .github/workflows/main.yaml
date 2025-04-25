@@ -45,8 +45,8 @@ jobs:
         with:
           name: dist
           path: dist
-      - run: npm ci --production=false # Install all dependencies including devDependencies
-      - run: npm run build # Rebuild to ensure everything is fresh
+      - run: npm ci --production=false
+      - run: npm run build
       - run: npm publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
@@ -54,6 +54,8 @@ jobs:
   deploy:
     needs: build
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
     - uses: actions/checkout@v4
     - uses: actions/download-artifact@v4
@@ -95,4 +97,3 @@ jobs:
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         publish_dir: ./docs
-
