@@ -40,6 +40,10 @@ const chat = new MatChat({
 
 
 ## 2. Vue.js Integration
+```
+npm install @workfloat/matchat
+```
+
 ```js
 // import
 import MatChat from 'matchat'
