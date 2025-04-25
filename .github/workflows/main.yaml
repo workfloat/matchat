@@ -45,6 +45,8 @@ jobs:
         with:
           name: dist
           path: dist
+      - run: npm ci --production=false # Install all dependencies including devDependencies
+      - run: npm run build # Rebuild to ensure everything is fresh
       - run: npm publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
