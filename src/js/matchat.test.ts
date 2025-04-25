@@ -100,9 +100,9 @@ describe('MatChat', () => {
     });
 
     it('should format markdown in messages', () => {
-      const formatted = (chatWidget as any).formatMessage('**bold** and *italic*');
-      expect(formatted).toContain('&lt;strong&gt;bold&lt;/strong&gt;');
-      expect(formatted).toContain('&lt;em&gt;italic&lt;/em&gt;');
+      const formatted = (chatWidget as any).formatMessage('**bold** and *italic*', 'user');
+      expect(formatted).toContain('<strong>bold</strong>');
+      expect(formatted).toContain('<em>italic</em>');
     });
 
     it('should sanitize HTML in messages', () => {
