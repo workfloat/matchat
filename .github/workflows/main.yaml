@@ -27,7 +27,7 @@ jobs:
         node-version: 20.x
     - run: npm ci
     - run: npm run build
-    - uses: actions/upload-artifact@v3
+    - uses: actions/upload-artifact@v4
       with:
         name: dist
         path: dist
@@ -41,7 +41,7 @@ jobs:
         with:
           node-version: 20.x
           registry-url: https://registry.npmjs.org
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: dist
           path: dist
@@ -49,26 +49,12 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-  cdnjs:
-    needs: publish-npm
-    runs-on: ubuntu-latest
-    steps:
-      - name: Create CDNJS PR
-        uses: cdnjs/autoversion@v1
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          package-name: '@workfloat/matchat'
-          version: ${{ github.ref_name }}
-          files: |
-            dist/*.js
-            dist/*.css
-
   deploy:
     needs: build
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
-    - uses: actions/download-artifact@v3
+    - uses: actions/download-artifact@v4
       with:
         name: dist
         path: dist
@@ -103,7 +89,8 @@ jobs:
         EOF
         touch docs/.nojekyll
     - name: Deploy to GitHub Pages
-      uses: peaceiris/actions-gh-pages@v3
+      uses: peaceiris/actions-gh-pages@v4
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         publish_dir: ./docs
+
